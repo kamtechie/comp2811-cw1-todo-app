@@ -1,9 +1,8 @@
 from app import db
-
-class Property(db.Model):
+class Todo(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    address = db.Column(db.String(500), index=True, unique=True)
-    start_date = db.Column(db.DateTime)
-    duration = db.Column(db.Integer)
-    rent = db.Column(db.Float)
-  
+    date_added = db.Column(db.DateTime)
+    title = db.Column(db.String(150))
+    description = db.Column(db.String(1000))
+    isComplete = db.Column(db.Boolean, default=False)
+    
