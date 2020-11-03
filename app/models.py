@@ -1,5 +1,5 @@
 from app import db
-class Todo(db.Model):
+class Task(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     date_added = db.Column(db.DateTime)
     title = db.Column(db.String(150))
