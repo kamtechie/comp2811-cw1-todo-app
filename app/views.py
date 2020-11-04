@@ -27,22 +27,9 @@ def add_task():
 def toggle_status():
     task_id = request.form['task_id']
     task = Task.query.get(task_id)
-    task.done = not task.done
+    task.isComplete = not task.isComplete
     db.session.commit()
     return str(task), 200
-
-
-@app.route('/edit', methods=['POST'])
-def edit_task():
-        task_id = request.form['task_id']
-        edit_text = request.form['edit_text']
-        if not edit_text:
-            flash('Please enter text for your task')
-            return redirect('/')
-        task = Task.query.get(task_id)
-        task.content = edit_text
-        db.session.commit()
-        return redirect('/')
 
 
 @app.route('/delete/<int:task_id>')
