@@ -9,11 +9,19 @@ def tasks_list():
     tasks = Task.query.all()
     return render_template('home.html', tasks=tasks)
 
+@app.route('/incomplete')
+def incomplete_list():
+    tasks = Task.query.filter_by(isComplete=False).all()
+    return render_template('home.html', tasks=tasks)
+
+@app.route('/complete')
+def complete_list():
+    tasks = Task.query.filter_by(isComplete=True).all()
+    return render_template('home.html', tasks=tasks)
 
 @app.route('/task', methods=['POST'])
 def add_task():
     form = request.form
-    print(form);
     if not form["name"] or not form["desc"] or not form["date"]:
         flash('Fields missing for new task', "error")
         return redirect('/')
