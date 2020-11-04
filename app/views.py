@@ -1,7 +1,7 @@
 from app import app, db
 from app.models import Task
 from flask import Flask, flash, redirect, render_template, request
-
+from datetime import datetime
 
 @app.route('/')
 @app.route('/index')
@@ -12,11 +12,12 @@ def tasks_list():
 
 @app.route('/task', methods=['POST'])
 def add_task():
-    content = request.form['content']
-    if not content:
-        flash('Please enter text for your task')
+    form = request.form
+    print(form);
+    if not form["name"] or not form["desc"] or not form["date"]:
+        flash('Fields missing for new task', "error")
         return redirect('/')
-    task = Task(content)
+    task = Task(date_added=datetime.strptime(form["date"], "%Y-%m-%d").date(), title=form["name"], description=form["desc"], isComplete=False)
     db.session.add(task)
     db.session.commit()
     return redirect('/')

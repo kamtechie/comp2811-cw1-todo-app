@@ -1,6 +1,17 @@
 {% extends "base.html" %} {% block content %}
 
-<!-- Todo bar -->
+<!-- Error zone-->
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    {% for category, message in messages %}
+    <div class="alert {% if category == 'error' %} alert-danger {% else %} alert-primary {% endif %}" role="alert">
+      {{ message }}
+    </div>
+    {% endfor %}
+  {% endif %}
+{% endwith %}
+
+<!-- Add task -->
 <form action="/task" method="post">
   <div class="card">
     <div class="card-header">Add a task</div>
@@ -29,91 +40,120 @@
 </form>
 
 <!-- Main table -->
-<table class="table-hover">
-  {% for task in tasks %}
-  <tr>
-    <td>
-      <input
-        type="checkbox"
-        id="{{ task.id }}"
-        name="content"
-        {%
-        if
-        task.done
-        %}
-        checked
-        {%
-        endif
-        %}
-      />
-    </td>
+<table class="table">
+  <thead>
+    <tr>
+      <th>Done?</th>
+      <th>Name</th>
+      <th>Description</th>
+      <th>Date</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for task in tasks %}
+    <tr>
+      <td>
+        <input
+          type="checkbox"
+          id="{{ task.id }}"
+          name="content"
+          {%
+          if
+          task.isComplete
+          %}
+          checked
+          {%
+          endif
+          %}
+        />
+      </td>
 
-    <td class="content task">
-      <label for="{{ task.id }}" class="{% if task.done %} done {% endif %}"
-        >{{ task.content }}</label
-      >
-    </td>
+      <td class="content task">
+        <label
+          for="{{ task.id }}"
+          class="{% if task.isComplete %} done {% endif %}"
+          >{{ task.title }}</label
+        >
+      </td>
 
-    <td align="right">
-      <span
-        ><a data-toggle="modal" class="edit" href="#edit_modal_{{ task.id }}"
-          >Edit</a
-        ></span
-      >
-    </td>
+      <td class="content task">
+        <label
+          for="{{ task.id }}"
+          class="{% if task.isComplete %} done {% endif %}"
+          >{{ task.description }}</label
+        >
+      </td>
 
-    <td align="right">
-      <span
-        ><a href="/delete/{{ task.id }}"
-          ><button type="button" class="btn btn-primary">X</button></a
-        ></span
-      >
-    </td>
+      <td class="content task">
+        <label
+          for="{{ task.id }}"
+          class="{% if task.isComplete %} done {% endif %}"
+          >{{ task.date_added }}</label
+        >
+      </td>
+      <td>
+        <span
+          ><a data-toggle="modal" class="edit" href="#edit_modal_{{ task.id }}"
+            ><button type="button" class="btn btn-warning">
+              <span class="material-icons"> create </span>
+            </button></a
+          ></span
+        >
+        <span
+          ><a href="/delete/{{ task.id }}"
+            ><button type="button" class="btn btn-danger">
+              <span class="material-icons"> delete </span>
+            </button></a
+          ></span
+        >
+      </td>
 
-    <!-- Edit Modal -->
-    <form action="/edit" method="post">
-      <div
-        class="modal fade"
-        id="edit_modal_{{task.id}}"
-        tabindex="-1"
-        role="dialog"
-      >
-        <div class="modal-dialog modal-dialog-centered" role="document">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title">Edit Task</h5>
-              <input name="task_id" type="hidden" value="{{task.id}}" />
-            </div>
-
-            <div class="modal-body">
-              <div class="input-group input-group-sm mb-3">
-                <input
-                  type="text"
-                  class="form-control"
-                  aria-label="Small"
-                  name="edit_text"
-                  aria-describedby="inputGroup-sizing-sm"
-                  value="{{ task.content }}"
-                />
+      <!-- Edit Modal -->
+      <form action="/edit" method="post">
+        <div
+          class="modal fade"
+          id="edit_modal_{{task.id}}"
+          tabindex="-1"
+          role="dialog"
+        >
+          <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title">Edit Task</h5>
+                <input name="task_id" type="hidden" value="{{task.id}}" />
               </div>
-            </div>
 
-            <div class="modal-footer">
-              <input type="submit" class="btn btn-primary" value="Ok" />
-              <button
-                type="button"
-                class="btn btn-secondary"
-                data-dismiss="modal"
-              >
-                Cancel
-              </button>
+              <div class="modal-body">
+                <div class="input-group input-group-sm mb-3">
+                  <input
+                    type="text"
+                    class="form-control"
+                    aria-label="Small"
+                    name="edit_text"
+                    aria-describedby="inputGroup-sizing-sm"
+                    value="{{ task.content }}"
+                  />
+                </div>
+              </div>
+
+              <div class="modal-footer">
+                <input type="submit" class="btn btn-primary" value="Ok" />
+                <button
+                  type="button"
+                  class="btn btn-secondary"
+                  data-dismiss="modal"
+                >
+                  Cancel
+                </button>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-    </form>
-  </tr>
-  {% endfor %}
+      </form>
+    </tr>
+    {% endfor %}
+  </tbody>
 </table>
 
 <hr />
@@ -125,7 +165,7 @@
       <td>
         <p>
           <span id="count"
-            >{{ (tasks|length) - (tasks|sum(attribute='done')) }}</span
+            >{{ (tasks|length) - (tasks|sum(attribute='isComplete')) }}</span
           >
           items left
         </p>
